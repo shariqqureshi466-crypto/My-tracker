@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Sender</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</head>
+<body>
+    <div style="text-align: center; margin-top: 50px; font-family: sans-serif;">
+        <h2>📍 Live Tracker Experiment</h2>
+        <p id="status">Waiting for GPS permission...</p>
+    </div>
+
+    <script>
+        // YOUR UPDATED FIREBASE CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyBJbxJhyYneksMRNylHbp-JKQqF4uVpaxc",
+            authDomain: "mytracker-31c39.firebaseapp.com",
+            projectId: "mytracker-31c39",
+            storageBucket: "mytracker-31c39.firebasestorage.app",
+            messagingSenderId: "252427552060",
+            appId: "1:252427552060:web:bd411bae4eb8db92704a39",
+            measurementId: "G-610SXC3K9R",
+            databaseURL: "https://mytracker-31c39-default-rtdb.firebaseio.com"
+        };
+        
+        // Start Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database().ref("live_location");
+
+        // Request and Watch Location
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition((pos) => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                
+                // Send to Google Firebase
+                db.set({
+                    lat: lat,
+                    lng: lng,
+                    time: Date.now()
+                });
+                
+                document.getElementById("status").innerText = "✔ Live Location is Syncing!";
+                console.log("Sent:", lat, lng);
+            }, (err) => {
+                document.getElementById("status").innerText = "Error: Please allow GPS access.";
+                console.error(err);
+            }, { 
+                enableHighAccuracy: true,
+                maximumAge: 0 
+            });
+        } else {
+            document.getElementById("status").innerText = "GPS not supported on this device.";
+        }
+    </script>
+</body>
+</html>
