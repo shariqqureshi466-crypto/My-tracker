@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style> #map { height: 100vh; } </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script>
+        // PASTE THE SAME FIREBASE CONFIG HERE
+        const firebaseConfig = { /* Same as above */ };
+        
+        firebase.initializeApp(firebaseConfig);
+        const map = L.map('map').setView([0, 0], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        const marker = L.marker([0, 0]).addTo(map);
+
+        // Listen for updates from the sender
+        firebase.database().ref("live_location").on("value", (snapshot) => {
+            const data = snapshot.val();
+            const pos = [data.lat, data.lng];
+            marker.setLatLng(pos);
+            map.setView(pos, 15);
+        });
+    </script>
+</body>
+</html>
